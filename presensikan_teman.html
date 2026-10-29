@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Presensi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      overflow-x: hidden;
+    }
+
+    #btnBackTop {
+      padding: 10px 25px;
+      font-size: 15px;
+      background-color: #007bff; 
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    #btnBackTop:hover {
+      background-color: #0056b3;
+    }
+
+    /* Wrapper input */
+    .input-wrapper {
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      margin: 15px;
+    }
+
+    /* Input */
+    .input-text-custom {
+      border-radius: 8px;
+      padding: 12px 15px;
+      border: 1px solid #ced4da;
+    }
+
+    .input-text-custom:focus {
+      border-color: #1877F2;
+      box-shadow: 0 0 5px rgba(24,119,242,0.4);
+      outline: none;
+    }
+
+    /* Floating label atas garis */
+    .floating-group {
+      position: relative;
+    }
+
+    .floating-group input {
+      height: 50px;
+    }
+
+    .floating-group label {
+      position: absolute;
+      top: -10px;
+      left: 12px;
+      background: white;
+      padding: 0 6px;
+      font-size: 13px;
+      color: #1877F2;
+      font-weight: 500;
+    }
+
+    #overlayBottom {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 9998;
+    }
+
+    #bottomSheet {
+        position: fixed;
+        bottom: -500px;
+        left: 0;
+        right: 0;
+        background: #f8f9fa;
+        border-radius: 24px 24px 0 0;
+        z-index: 9999;
+        transition: bottom 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+        max-height: 90vh;
+        overflow-y: auto;
+        min-height: 250px;
+    }
+    
+    #bottomSheet .btn {
+        height: 48px;
+        font-weight: 600;
+        border-radius: 12px;
+    }
+
+    #bottomSheet.active {
+        bottom: 0;
+    }
+
+    .sheet-header {
+        text-align: center;
+        padding-top: 10px;
+        padding: 15px 15px 5px;
+    }
+
+    .sheet-bar {
+        width: 60px;
+        height: 5px;
+        background: #ccc;
+        border-radius: 10px;
+        margin: auto;
+    }
+
+    .card-menu {
+        border: none;
+        border-radius: 18px;
+        transition: all 0.25s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .card-menu:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    }
+
+    .card-menu:active {
+        transform: scale(0.97);
+    }
+
+    .icon {
+        font-size: 34px;
+    }
+
+    #sheetNama {
+        font-size: 20px;
+        margin-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+ 
+<div id="overlayBottom"></div>
+
+
+<div id="bottomSheet">
+
+    <div class="sheet-header">
+        <div class="sheet-bar"></div>
+        <h5 id="sheetNama" class="fw-bold mt-2"></h5>
+    </div>
+
+    <div class="p-3">
+
+      <div class="row g-3">
+
+          <!-- Presensi Datang -->
+          <div class="col-6">
+              <div class="card card-menu text-center p-3 h-100" id="btnDatang">
+                  <div class="icon text-primary">
+                      <i class="bi bi-box-arrow-in-right"></i>
+                  </div>
+                  <h6 class="mt-2 mb-0">Presensi Datang</h6>
+              </div>
+          </div>
+
+          <!-- Presensi Pulang -->
+          <div class="col-6">
+              <div class="card card-menu text-center p-3 h-100" id="btnPulang">
+                  <div class="icon text-danger">
+                      <i class="bi bi-box-arrow-left"></i>
+                  </div>
+                  <h6 class="mt-2 mb-0">Presensi Pulang</h6>
+              </div>
+          </div>
+
+          <!-- Penugasan Datang -->
+          <div class="col-6">
+              <div class="card card-menu text-center p-3 h-100" id="btnTugasDatang">
+                  <div class="icon text-success">
+                      <i class="bi bi-briefcase"></i>
+                  </div>
+                  <h6 class="mt-2 mb-0">Penugasan Datang</h6>
+              </div>
+          </div>
+
+          <!-- Penugasan Pulang -->
+          <div class="col-6">
+              <div class="card card-menu text-center p-3 h-100" id="btnTugasPulang">
+                  <div class="icon text-warning">
+                      <i class="bi bi-briefcase-fill"></i>
+                  </div>
+                  <h6 class="mt-2 mb-0">Penugasan Pulang</h6>
+              </div>
+          </div>
+
+      </div>
+
+    </div>
+
+</div>
+
+<div class="container-fluid p-0">
+
+  <!-- Header -->
+  <div class="card mb-1 border-0 rounded-0">
+    <div class="card-header d-flex justify-content-between align-items-center fw-bold text-white"
+      style="background-color: #1877F2;">
+
+      <div>Presensikan Teman</div>
+
+      <button id="btnBackTop" class="btn btn-sm btn-outline-success fw-semibold px-3">
+        <i class="fa fa-sign-out me-1"></i> Kembali
+      </button>
+
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-wrapper">
+    <div class="floating-group">
+      <input type="text" id="nama" class="form-control input-text-custom" required>
+      <label>Cari Nama</label>
+    </div>
+  </div>
+
+  <div class="container mt-2" id="hasilPencarian">
+     <!-- hasil muncul di sini -->
+  </div>
+
+</div>
+
+
+<script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/sweet.js"></script>
+<script type="text/javascript" src="js/link.js"></script>
+
+<script>
+  document.getElementById("btnBackTop").onclick = function() {
+    window.location.href = 'users';
+  };
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+        let id, name, lat, lang, absendatang, absenpulang, radius;
+
+        let delayTimer;
+
+        $('#nama').on('keyup', function(){
+
+            clearTimeout(delayTimer);
+
+            let nama = $(this).val();
+
+            delayTimer = setTimeout(function(){
+
+                if(nama.length < 1){
+                    $('#hasilPencarian').html("");
+                    return;
+                }
+
+                $.ajax({
+                    url: linker_api + "api/search_nama/" + nama, 
+                    type: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')  
+                    },
+                    success: function(response) {
+
+                        let html = "";
+
+                        if(response.data.length === 0){
+                            html = `<div class="text-center text-muted">Data tidak ditemukan</div>`;
+                        } else {
+
+                            response.data.forEach(function(user){
+
+                                html += `
+                                    <div class="card mb-2 shadow-sm border-start border-1 border-primary user-card"
+                                        data-name='${user.name}'
+                                        data-id="${user.id}"
+                                        data-lat="${user.lokasi.lat}"
+                                        data-lang="${user.lokasi.lang}"
+                                        data-absendatang="${user.lokasi.absen_datang}"
+                                        data-absenpulang="${user.lokasi.absen_pulang}"
+                                        data-radius="${user.lokasi.radius}"
+
+
+                                        style="cursor:pointer;">
+                                        <div class="card-body">
+                                            <h6 class="mb-1 fw-bold">${user.name}</h6>
+                                            <small>Lokasi Presensi: ${user.lokasi?.nama_tempat ?? '-'}</small>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                        }
+
+                        $('#hasilPencarian').html(html);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("error:", error);
+                    }
+                });
+
+            }, 400);
+
+        });
+
+        $(document).on('click', '.user-card', function(){
+
+            console.log("CARD DIKLIK");
+
+            id = $(this).data('id');
+            name = $(this).data('name');
+            lat = $(this).data('lat');
+            lang = $(this).data('lang');
+            absendatang = $(this).data('absendatang');
+            absenpulang = $(this).data('absenpulang');
+            radius = $(this).data('radius');
+
+            $('#sheetNama').text(name);
+
+            $('#overlayBottom').fadeIn(200);
+            $('#bottomSheet').addClass('active');
+
+        });
+
+        $('#overlayBottom').click(function(){
+            $('#overlayBottom').fadeOut(200);
+            $('#bottomSheet').removeClass('active');
+        });
+
+
+        //BOTTOM
+        //Datang
+        $(document).on('click', '#btnDatang', function() {
+
+            localStorage.setItem('code_t', '0');
+            localStorage.setItem('absen_datang', absendatang);
+            localStorage.setItem('absen_pulang', absenpulang);
+            localStorage.setItem('lat', lat);
+            localStorage.setItem('lng', lang);
+            localStorage.setItem('radius', radius);
+            localStorage.setItem('ide', id);
+
+            
+
+
+            window.location.assign('absensi_sahib');
+
+        });
+
+        //Pulang
+        $(document).on('click', '#btnPulang', function() {
+
+            localStorage.setItem('code_t', '1');
+            localStorage.setItem('absen_datang', absendatang);
+            localStorage.setItem('absen_pulang', absenpulang);
+            localStorage.setItem('lat', lat);
+            localStorage.setItem('lng', lang);
+            localStorage.setItem('radius', radius);
+            localStorage.setItem('ide', id);
+
+            window.location.assign('absensi_sahib');
+
+        });
+
+
+        //PenuDatang
+        $(document).on('click', '#btnTugasDatang', function() {
+
+            localStorage.setItem('code_t', '0');
+            
+            localStorage.setItem('ide', id);
+
+            window.location.assign('penugasan_teman');
+
+        });
+
+        //PenuPulang
+        $(document).on('click', '#btnTugasPulang', function() {
+
+            localStorage.setItem('code_t', '1');
+           
+            localStorage.setItem('ide', id);
+
+            window.location.assign('penugasan_teman');
+
+        });
+    });
+</script>
+
+
+
+</body>
+</html>

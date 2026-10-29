@@ -1,0 +1,95 @@
+
+<script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/sweet.js"></script>
+<script type="text/javascript" src="js/link.js"></script>
+
+<script>
+    $(document).ready(function() {
+
+        var ide = localStorage.getItem("ide");
+
+        let data = {
+            id_user: ide,
+        };
+
+        $.ajax({
+            url: linker_api + "api/absensi/store_penupulang",
+            type: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            data: data,
+
+            success: function(response) {
+
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Presensi Penugasan Pulang Berhasil...',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.assign('users');
+                });
+
+            },
+
+            error: function(xhr) {
+
+                console.log(xhr.responseText);
+
+                // ✔️ Jika sudah absen / data duplicate
+                if (xhr.status === 404) {
+
+                    Swal.fire({
+                        title: 'Info!',
+                        text: 'Anda Belum Melakukan Presensi Datang Hari Ini...',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.assign('users');
+                    });
+
+                }else if (xhr.status === 406) {
+
+                    Swal.fire({
+                        title: 'Info!',
+                        text: 'Anda sudah melakukan presensi pulang hari ini...',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.assign('users');
+                    });
+
+                }else if (xhr.status === 303) {
+
+                    Swal.fire({
+                        title: 'Info!',
+                        text: 'Belum Jam Pulang',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.assign('users');
+                    });
+
+                }
+
+                // ✔️ Error server (500, 403, dll)
+                else {
+
+                    Swal.fire({
+                        title: 'Info!',
+                        text: 'Terjadi Kesalahan Pada Server',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.assign('users');
+                    });
+
+                }
+            }
+        });
+
+    });
+
+</script>

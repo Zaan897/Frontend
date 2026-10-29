@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Realtime Radius Check</title>
+    <style>
+        #map-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #overlay-ui {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+        }
+
+        #btnPresensi {
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #btnPresensi:hover {
+            background-color: #0056b3;
+        }
+
+        #btnPresensi:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        #top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        #btnBackTop {
+            padding: 10px 25px;
+            font-size: 15px;
+
+            background-color: #007bff; 
+            color: white;
+
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        #btnBackTop:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<input type="hidden" id="lat" placeholder="Latitude">
+<input type="hidden" id="lng" placeholder="Longitude">
+
+<!-- <p id="status">Menunggu data...</p> -->
+
+<div id="top-bar">
+    <p id="status">Menunggu data...</p>
+    <button id="btnBackTop">Kembali</button>
+</div>
+
+<div id="map-container">
+    <div id="map"></div>
+
+    <div id="overlay-ui">
+        <button id="btnPresensi">Presensi</button>
+    </div>
+
+</div>
+
+
+
+
+<script>
+let map;
+let centerMarker;
+let userMarker;
+let circle;
+
+var datang_abs = localStorage.getItem("absen_datang");
+var pulang_abs = localStorage.getItem("absen_pulang");
+var lat = localStorage.getItem("lat");
+var lng = localStorage.getItem("lng");
+var radius = localStorage.getItem("radius");
+var code = localStorage.getItem("code");
+
+
+// fungsi convert
+function toNumber(value) {
+  return parseFloat(value);
+}
+
+// validasi
+if (!lat || !lng || !radius) {
+  alert("Latitude, Longitude, atau Radius belum tersedia!");
+  throw new Error("Data tidak lengkap"); // stop eksekusi
+}
+
+const latNum = toNumber(lat);
+const lngNum = toNumber(lng);
+const radiusNum = toNumber(radius);
+
+// cek apakah valid number
+if (isNaN(latNum) || isNaN(lngNum) || isNaN(radiusNum)) {
+  alert("Format data tidak valid!");
+  throw new Error("Data bukan angka"); // stop eksekusi
+}
+
+// kalau lolos semua
+const centerPoint = {
+  lat: latNum,
+  lng: lngNum
+};
+
+const radiusMeter = radiusNum;
+
+function initMap() {
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 20,
+        center: centerPoint
+    });
+
+    // ================= CENTER =================
+    centerMarker = new google.maps.Marker({
+        position: centerPoint,
+        map: null,
+        label: "C"
+    });
+
+    circle = new google.maps.Circle({
+        map: map,
+        center: centerPoint,
+        radius: radiusMeter,
+        fillColor: "#007bff",
+        fillOpacity: 0.3,
+        strokeColor: "#007bff"
+    });
+
+    userMarker = new google.maps.Marker({
+        position: centerPoint,
+        map: map,
+        label: "U"
+    });
+
+    // ================= AUTO LOOP 0.5 DETIK =================
+    setInterval(function () {
+
+        let lat = parseFloat(document.getElementById("lat").value);
+        let lng = parseFloat(document.getElementById("lng").value);
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+
+            let posisi = { lat: lat, lng: lng };
+
+            // update marker
+            userMarker.setPosition(posisi);
+            map.setCenter(posisi);
+
+            // cek radius
+            cekRadius(posisi);
+        }
+
+    }, 500); // 500ms = 0.5 detik
+}
+
+// ================= CEK RADIUS =================
+function cekRadius(posisi) {
+
+    let jarak = google.maps.geometry.spherical.computeDistanceBetween(
+        posisi,
+        circle.getCenter()
+    );
+
+    let status = document.getElementById("status");
+    let btn = document.getElementById("btnPresensi");
+
+    if (jarak <= radiusMeter) {
+
+        circle.setOptions({
+            fillColor: "#007bff",
+            strokeColor: "#007bff"
+        });
+
+        status.innerHTML =
+            "✅ Dalam radius (" + Math.round(jarak) + " meter)";
+            btn.disabled = false;
+
+    } else {
+
+            circle.setOptions({
+            fillColor: "#dc3545",
+            strokeColor: "#dc3545"
+        });
+
+        status.innerHTML =
+            "❌ Diluar radius (" + Math.round(jarak) + " meter)";
+           btn.disabled = true;
+    }
+}
+
+document.getElementById("btnPresensi").addEventListener("click", function () {
+
+    let lat = parseFloat(document.getElementById("lat").value);
+    let lng = parseFloat(document.getElementById("lng").value);
+
+    if (isNaN(lat) || isNaN(lng)) {
+        alert("Lokasi belum tersedia");
+        return;
+    }
+
+    if(code=="0"){
+      window.location.assign('presensi_datang');
+
+    }else{
+     window.location.assign('presensi_pulang');
+
+    }
+
+});
+
+document.getElementById("btnBackTop").onclick = function() {
+    window.location.href = document.referrer;
+};
+          
+
+</script>
+
+
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXgC8-OHwuHFdM5K0Qxi1xmvxcSBmrLWo&libraries=geometry&callback=initMap"
+async defer></script>
+
+
+</body>
+</html>

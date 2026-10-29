@@ -1,0 +1,110 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+			<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  	<title>Attendance</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" fetchpriority="high">
+	
+	<link rel="stylesheet" href="login_assets/style.css">
+
+	</head>
+	<body>
+	<section class="ftco-section">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">ATTENDANCE</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-md-7 col-lg-5">
+					<div class="login-wrap p-4 p-md-5">
+		      	<div class="icon d-flex align-items-center justify-content-center">
+		      		<span class="fa fa-user-o"></span>
+		      	</div>
+		      	<h3 class="text-center mb-4">Sign In</h3>
+						<form class="login-form">
+		      		<div class="form-group">
+		      			<input type="text" id="username" value="firman_123" class="form-control rounded-left" placeholder="Username" required>
+		      		</div>
+	            <div class="form-group d-flex">
+	              <input type="password" id="password" value="123456" class="form-control rounded-left" placeholder="Password" required>
+	            </div>
+	            <div class="form-group">
+	            	<button type="submit" id = "login" class="form-control btn btn-primary rounded submit px-3">Login</button>
+	            </div>
+	            
+	          </form>
+	        </div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>
+
+<script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/plugins/jquery/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/sweet.js"></script>
+<script type="text/javascript" src="js/link.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#login').on('click',function(){
+            event.preventDefault();
+            var username=$('#username').val();
+            var password=$('#password').val();
+            
+            $.ajax({
+                url: linker_api + 'api/loginuser',
+                type: 'POST',
+                headers: { 'Accept': 'application/json' },
+                data: {username:username, password:password},
+                success: function(data) {
+                    
+                     $('#username').val('');
+                     $('#password').val('');
+
+                     localStorage.setItem('id', data.user.id);
+                     localStorage.setItem('level', data.user.level);
+                     localStorage.setItem('penugasan', data.user.penugasan);
+                     localStorage.setItem('token', data.token);
+                     localStorage.setItem('nama', data.user.name);
+                     localStorage.setItem('nama_tempat', data.user.lokasi.nama_tempat);
+                     localStorage.setItem('absen_datang', data.user.lokasi.absen_datang);
+                     localStorage.setItem('absen_pulang', data.user.lokasi.absen_pulang);
+                     localStorage.setItem('lat', data.user.lokasi.lat);
+                     localStorage.setItem('lng', data.user.lokasi.lang);
+                     localStorage.setItem('radius', data.user.lokasi.radius);
+
+
+                     window.location.assign('users');
+                },
+                error: function(xhr, status, error) {                    
+                  let info = xhr.responseJSON.errors; 
+                  
+                  if(xhr.status == 404 || xhr.status == 401) info = xhr.responseJSON.message;
+                  Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: info.username || info.password || info,
+                  });
+                  console.log(`error : ${error}`, xhr);
+                  $('#username').val('');
+                  $('#password').val('');
+
+              }
+            })
+        });
+    });
+</script>
+

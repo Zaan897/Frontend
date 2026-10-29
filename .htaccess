@@ -1,0 +1,39 @@
+RewriteEngine On
+RewriteBase /attendance
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d 
+
+
+RewriteRule ^4dm1n$ dashboard.php
+RewriteRule ^users$ dashboard_user.php
+RewriteRule ^login_users$ user.html
+RewriteRule ^absensi_datang$ tes.html
+RewriteRule ^absensi_sahib$ tes1.html
+
+RewriteRule ^presensi_datang$ presensi_datang.html
+RewriteRule ^presensi_pulang$ presensi_pulang.html
+RewriteRule ^presensi_penudatang$ presensipenu_datang.html
+RewriteRule ^presensi_penupulang$ presensi_penupulang.html
+RewriteRule ^riwayat_presensi$ riwayat_presensi.html
+RewriteRule ^penugasan$ penugasan.html
+RewriteRule ^presensi_teman$ presensikan_teman.html
+
+
+#presensi teman pulang
+RewriteRule ^presensiteman_datang$ presensiteman_datang.html
+RewriteRule ^presensiteman_pulang$ presensiteman_pulang.html
+
+
+RewriteRule ^penugasan_teman$ penugasan_teman.html
+RewriteRule ^presensipenuteman_datangteman$ presensipenuteman_datangteman.html
+RewriteRule ^presensi_penupulangteman$ presensi_penupulangteman.html
+
+
+
+
+RewriteRule ^([a-zA-Z0-9_-]+)$ dashboard.php?module=$1
+
+
+
+Options All -Indexes

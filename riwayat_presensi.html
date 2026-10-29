@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Riwayat Presensi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body { background-color: #f8f9fa; }
+    .card-history { transition: 0.2s; }
+    .card-history:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    
+    .btn-back {
+        transition: 0.2s;
+        border-radius: 10px;
+    }
+
+    .btn-back:hover {
+        transform: translateX(-3px);
+        background-color: #f1f1f1;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold">Riwayat Presensi </h4>
+    <button onclick="window.history.back()" class="btn btn-light shadow-sm btn-back d-flex align-items-center gap-2 px-3">
+        <i class="bi bi-arrow-left"></i>
+        <span>Kembali</span>
+    </button>
+  </div>
+
+  <div id="list-riwayat"></div>
+
+</div>
+
+<script src="js/plugins/jquery/jquery.min.js"></script>
+<script src="js/sweet.js"></script>
+<script src="js/link.js"></script>
+
+<script>
+$(document).ready(function() {
+
+    var id = localStorage.getItem("id");
+
+    loadRiwayat();
+
+    function loadRiwayat() {
+
+        console.log(linker_api + 'api/absensi/history');
+
+        $.ajax({
+            url: linker_api + 'api/absensi/history',
+            type: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            success: function(response) {
+                let list = response.data || [];
+
+                if (list.length === 0) {
+                $('#list-riwayat').html('<div class="alert alert-info">Belum ada riwayat</div>');
+                return;
+            }
+
+                let html = '';
+
+                list.forEach(function(data) {
+
+                    const bulan = [
+                        "Januari","Februari","Maret","April","Mei","Juni",
+                        "Juli","Agustus","September","Oktober","November","Desember"
+                    ];
+
+                    let tgl = new Date(data.tgl);
+                    let formatted = tgl.getDate() + " " +
+                                    bulan[tgl.getMonth()] + " " +
+                                    tgl.getFullYear();
+
+                    let badge = '';
+                    if (data.keterangan_presensi === 'Penugasan') {
+                        badge = '<span class="badge bg-warning text-dark">Penugasan</span>';
+                    } else {
+                        badge = '<span class="badge bg-primary">Reguler</span>';
+                    }
+
+                    let statusColor = data.presensi === 'Hadir' ? 'text-success' : 'text-danger';
+
+                    let statusBadge = '';
+
+                    if (data.presensi === 'Hadir') {
+                        statusBadge = '<span class="badge bg-success">Hadir</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-danger">Tidak Hadir</span>';
+                    }
+
+                    html += `
+                    <div class="card mb-3 p-3">
+
+                        <div class="d-flex justify-content-between">
+                            <strong>${formatted}</strong>
+                            ${badge}
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+
+                            <div class="d-flex flex-column">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-box-arrow-in-right text-success me-2"></i>
+                                    <span>Datang</span>
+                                </div>
+
+                                <small class="text-muted ms-4 fst-italic" style="font-size: 13px;">
+                                    (${data.keterangan_datang || '-'})
+                                </small>
+                            </div>
+
+                            <div class="fw-bold text-success">
+                                ${data.jam_datang || '-'}
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <div class="d-flex flex-column">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-box-arrow-left text-danger me-2"></i>
+                                    <span>Pulang</span>
+                                </div>
+
+                                <small class="text-muted ms-4 fst-italic" style="font-size: 13px;">
+                                    (${data.keterangan_pulang || '-'})
+                                </small>
+                            </div>
+
+                            <div class="fw-bold text-danger">
+                                ${data.jam_pulang || '-'}
+                            </div>
+
+                        </div>
+
+                        <div>${statusBadge}</div>
+
+                    </div>
+                    `;
+
+                });
+
+                $('#list-riwayat').html(html);
+            },
+            error: function(xhr) {
+
+                if (xhr.status === 404) {
+                    $('#list-riwayat').html('<div class=\"alert alert-info\">Belum ada presensi hari ini</div>');
+                } else {
+                    $('#list-riwayat').html('<div class=\"alert alert-danger\">Terjadi kesalahan</div>');
+                }
+            }
+        });
+    }
+
+});
+</script>
+
+</body>
+</html>
